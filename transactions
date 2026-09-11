@@ -1,0 +1,30 @@
+[
+  {
+    "_id": "tx_20260911_001",
+    "user_id": "user_rian_techpro",
+    "timestamp_utc": "2026-09-11T05:30:00Z",
+    "user_timezone": "Asia/Jakarta",
+    "description": "Beli Kopi Starbucks Premium",
+    "amount": 55000,
+    "transaction_type": "OUTFLOW",
+    "category": "Wants",
+    "source_wallet_id": "w_gopay_02",
+    "destination_wallet_id": null,
+    "is_recurring": false,
+    "raw_nlp_text": "beli kopi starbucks 55rb pake gopay tadi jam 12.30"
+  },
+  {
+    "_id": "tx_20260911_002",
+    "user_id": "user_rian_techpro",
+    "timestamp_utc": "2026-09-11T07:00:00Z",
+    "user_timezone": "Asia/Jakarta",
+    "description": "Mutasi Saldo Mandiri",
+    "amount": 500000,
+    "transaction_type": "TRANSFER",
+    "category": "Allocation",
+    "source_wallet_id": "w_bca_01",
+    "destination_wallet_id": "w_gopay_02",
+    "is_recurring": false,
+    "raw_nlp_text": "pindahin uang dari bca ke gopay 500rb sore ini"
+  }
+]

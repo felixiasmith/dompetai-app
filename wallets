@@ -1,0 +1,30 @@
+[
+  {
+    "_id": "w_bca_01",
+    "user_id": "user_rian_techpro",
+    "name": "BCA Utama",
+    "type": "BANK",
+    "balance": 18500000,
+    "currency": "IDR",
+    "updated_at": "2026-09-11T13:44:00Z"
+  },
+  {
+    "_id": "w_gopay_02",
+    "user_id": "user_rian_techpro",
+    "name": "GoPay",
+    "type": "E_WALLET",
+    "balance": 750000,
+    "currency": "IDR",
+    "updated_at": "2026-09-11T13:44:00Z"
+  },
+  {
+    "_id": "w_cc_03",
+    "user_id": "user_rian_techpro",
+    "name": "Credit Card",
+    "type": "CREDIT",
+    "balance": -2400000,
+    "credit_limit": 20000000,
+    "currency": "IDR",
+    "updated_at": "2026-09-11T13:44:00Z"
+  }
+]

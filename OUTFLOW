@@ -1,0 +1,22 @@
+# Contoh penerapan di dalam route FastAPI Anda:
+@router.post("/transaction")
+async def create_transaction(tx_data: TransactionIn, background_tasks: BackgroundTasks):
+    # 1. Jalankan proses mutasi database (Phase 2)
+    result = await process_transaction_ledger(db_client, tx_data)
+    
+    # 2. Ambil data budget terkini (Phase 3)
+    budget_status = await get_budget_health_score(tx_data.user_id, db_client)
+    
+    # 3. Picu deteksi otomatis di latar belakang (Phase 6)
+    wants_actual = budget_status["breakdown"]["wants"]["actual"]
+    wants_target = budget_status["breakdown"]["wants"]["target"]
+    
+    trigger_budget_limit_alert(
+        background_tasks, 
+        to_phone=tx_data.user_id.replace("user_", ""), 
+        category="Wants (Gaya Hidup)", 
+        actual=wants_actual, 
+        limit=wants_target
+    )
+    
+    return result

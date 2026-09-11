@@ -113,37 +113,44 @@
         function renderUI() {
             // 1. Render Kartu Saldo Dompet
             const walletContainer = document.getElementById('wallet-container');
-            walletContainer.innerHTML = '';
-            data.wallets.forEach(w => {
-                let colorStyle = w.balance < 0 ? 'color: #f43f5e;' : 'color: #34d399;';
-                walletContainer.innerHTML += `
-                    <div class="wallet-box">
-                        <p class="wallet-name">${w.name}</p>
-                        <p class="wallet-bal" style="${colorStyle}">${formatIDR(w.balance)}</p>
-                    </div>
-                `;
-            });
+            if (walletContainer) {
+                walletContainer.innerHTML = '';
+                data.wallets.forEach(w => {
+                    let colorStyle = w.balance < 0 ? 'color: #f43f5e;' : 'color: #34d399;';
+                    walletContainer.innerHTML += `
+                        <div class="wallet-box">
+                            <p class="wallet-name">${w.name}</p>
+                            <p class="wallet-bal" style="${colorStyle}">${formatIDR(w.balance)}</p>
+                        </div>
+                    `;
+                });
+            }
 
             // 2. Render Tabel Transaksi
             const txContainer = document.getElementById('tx-container');
-            txContainer.innerHTML = '';
-            data.transactions.forEach(t => {
-                let isInc = t.type === 'in';
-                txContainer.innerHTML += `
-                    <div class="tx-item">
-                        <div>
-                            <div style="font-weight: 500; color: #e2e8f0;">${t.desc}</div>
-                            <div style="font-size: 0.65rem; color:#94a3b8; margin-top: 2px;">${t.time} • ${t.wallet}</div>
+            if (txContainer) {
+                txContainer.innerHTML = '';
+                data.transactions.forEach(t => {
+                    let isInc = t.type === 'in';
+                    txContainer.innerHTML += `
+                        <div class="tx-item">
+                            <div>
+                                <div style="font-weight: 500; color: #e2e8f0;">${t.desc}</div>
+                                <div style="font-size: 0.65rem; color:#94a3b8; margin-top: 2px;">${t.time} • ${t.wallet}</div>
+                            </div>
+                            <span style="font-weight: bold; font-size: 0.9rem;" class="${isInc ? 'text-green' : 'text-red'}">
+                                ${isInc ? '+' : '-'}${formatIDR(t.amount)}
+                            </span>
                         </div>
-                        <span style="font-weight: bold; font-size: 0.9rem;" class="${isInc ? 'text-green' : 'text-red'}">
-                            ${isInc ? '+' : '-'}${formatIDR(t.amount)}
-                        </span>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
             // 3. Render Catatan AI Advisor
-            document.getElementById('aiAdvice').innerText = data.aiAdvice;
+            const adviceEl = document.getElementById('aiAdvice');
+            if (adviceEl) {
+                adviceEl.innerText = data.aiAdvice;
+            }
         }
 
         // Fungsi Pengolah Kata Kunci Bahasa Sehari-hari (NLP Core Engine)
@@ -163,9 +170,3 @@
             // Deteksi Akun Dompet Tujuan
             let target = data.wallets[0]; // Default ke BCA
             if (textLower.includes('gopay')) target = data.wallets[1];
-            if (textLower.includes('cash') || textLower.includes('tunai')) target = data.wallets[2];
-            if (textLower.includes('cc') || textLower.includes('kartu kredit')) target = data.wallets[3];
-
-            // Mutasikan Nilai Saldo secara Real-Time
-            if (isInc) {
-                target.balance += amt;

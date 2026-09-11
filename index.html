@@ -4,154 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DompetAI - Asisten Finansial Modern</title>
-    <!-- Alpine.js untuk Reaktivitas Instan -->
-    <script defer src="https://jsdelivr.net"></script>
     <style>
-        /* Gaya Visual Standar Premium - Bebas Eror Loading Tailwind */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; bg-color: #0b0f19; background: #0b0f19; color: #f1f5f9; margin: 0; padding: 0; }
-        header { border-bottom: 1px solid #1e293b; background: rgba(21, 27, 44, 0.8); padding: 15px 20px; display: flex; justify-content: space-between; items-center: center; }
-        .logo { font-weight: bold; font-size: 1.2rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; rounded-radius: 8px; border-radius: 8px; }
+        /* Desain Dasbor Premium Gelap (Dark Mode) - Tanpa Koneksi Luar */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #0b0f19; color: #f1f5f9; margin: 0; padding: 0; }
+        header { border-bottom: 1px solid #1e293b; background: #151b2c; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: bold; font-size: 1.2rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 8px; }
+        .tag-demo { font-size: 0.75rem; background: rgba(37,99,235,0.1); color: #60a5fa; padding: 4px 10px; border-radius: 20px; margin-left: 10px; }
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         @media(max-width: 768px) { .container { grid-template-columns: 1fr; } }
-        .card { background: #151b2c; border: 1px solid #1e293b; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .wallet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .wallet-box { background: #151b2c; border: 1px solid #1e293b; padding: 15px; border-radius: 12px; }
+        .card { background: #151b2c; border: 1px solid #1e293b; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
+        .wallet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .wallet-box { background: #111726; border: 1px solid #1e293b; padding: 15px; border-radius: 12px; }
         .wallet-name { font-size: 0.75rem; color: #94a3b8; font-weight: 500; margin: 0; text-transform: uppercase; }
-        .wallet-bal { font-size: 1.15rem; font-weight: bold; margin: 5px 0 0 0; color: #34d399; }
+        .wallet-bal { font-size: 1.15rem; font-weight: bold; margin: 5px 0 0 0; }
         .input-group { display: flex; gap: 10px; margin-top: 10px; }
-        input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 10px 15px; color: white; font-size: 0.875rem; outline: none; }
+        input[type="text"] { flex: 1; background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px 15px; color: white; font-size: 0.875rem; outline: none; }
         input[type="text"]:focus { border-color: #2563eb; }
-        button { background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.875rem; transition: background 0.2s; }
-        button:hover { background: #1d4ed8; }
-        .btn-reset { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; }
+        .btn-send { background: #2563eb; color: white; border: none; padding: 10px 25px; border-radius: 10px; font-weight: 600; cursor: pointer; }
+        .btn-send:hover { background: #1d4ed8; }
+        .btn-reset { background: rgba(244, 63, 94, 0.1); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; }
         .budget-bar { height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        .budget-fill { height: 100%; background: #2563eb; }
+        .budget-fill { height: 100%; }
+        .tx-list { margin-top: 10px; }
         .tx-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(51,65,85,0.4); font-size: 0.85rem; }
         .text-green { color: #34d399; } .text-red { color: #f43f5e; }
     </style>
 </head>
-<body x-data="financeApp()">
+<body>
     
     <header>
-        <div style="display: flex; items-center: center; gap: 15px;">
+        <div style="display: flex; align-items: center;">
             <div class="logo">💰 DompetAI</div>
-            <span style="font-size: 0.75rem; background: rgba(37,99,235,0.1); color: #60a5fa; padding: 4px 10px; border-radius: 20px;">Mode Cloud Offline-Safe</span>
+            <span class="tag-demo">Mode Mandiri (100% Offline-Safe)</span>
         </div>
-        <button class="btn-reset" @click="resetData()">Clear Slate</button>
+        <button class="btn-reset" onclick="resetData()">Clear Slate</button>
     </header>
 
     <div class="container">
-        <!-- Kolom Kiri: Dashboard Core -->
+        <!-- Kolom Kiri: Inti Aplikasi -->
         <div>
-            <div class="wallet-grid">
-                <template x-for="wallet in wallets">
-                    <div class="wallet-box">
-                        <p class="wallet-name" x-text="wallet.name"></p>
-                        <p class="wallet-bal" :style="wallet.balance < 0 ? 'color: #f43f5e' : 'color: #34d399'" x-text="formatIDR(wallet.balance)"></p>
-                    </div>
-                </template>
-            </div>
+            <!-- Kotak Saldo Dompet -->
+            <div class="wallet-grid" id="wallet-container"></div>
 
+            <!-- Kolom Input Catatan Pintar -->
             <div class="card" style="border-left: 4px solid #2563eb;">
-                <label style="font-size: 0.875rem; font-weight: 600;">✨ Catat Transaksi dengan Bahasa Sehari-hari (AI Engine):</label>
+                <label style="font-size: 0.875rem; font-weight: 600;">✨ Catat Transaksi dengan Bahasa Sehari-hari (AI Parser Engine):</label>
                 <div class="input-group">
-                    <input type="text" x-model="inputText" @keydown.enter="parseInput()" placeholder="Contoh: dapat gaji 5jt dari kantor masuk BCA">
-                    <button @click="parseInput()">Kirim</button>
+                    <input type="text" id="inputText" placeholder="Contoh: dapat gaji 5.000.000 via BCA atau jajan kopi 35000 via GoPay">
+                    <button class="btn-send" onclick="parseInput()">Kirim</button>
                 </div>
             </div>
 
+            <!-- Batas Anggaran 50/30/20 -->
             <div class="card">
-                <h3 style="font-size: 0.875rem; margin-top: 0;">Alokasi Anggaran 50/30/20</h3>
-                <div style="font-size: 0.75rem; margin-bottom: 10px;">
-                    <div style="display:flex; justify-content:space-between;"><span>Needs (Kebutuhan 50%)</span><span style="color:#94a3b8">Rp 7.5jt / Rp 7.5jt</span></div>
+                <h3 style="font-size: 0.875rem; margin-top: 0; margin-bottom: 15px;">Alokasi Anggaran 50/30/20</h3>
+                <div style="font-size: 0.75rem; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between;"><span>Needs (Kebutuhan wajib 50%)</span><span style="color:#94a3b8">Rp 7.500.000 / Rp 7.500.000</span></div>
                     <div class="budget-bar"><div class="budget-fill" style="width: 100%; background: #94a3b8;"></div></div>
                 </div>
-                <div style="font-size: 0.75rem; margin-bottom: 10px;">
-                    <div style="display:flex; justify-content:space-between;"><span>Wants (Keinginan 30%)</span><span style="color:#94a3b8">Rp 4.2jt / Rp 4.5jt</span></div>
-                    <div class="budget-bar"><div class="budget-fill" style="width: 93%;"></div></div>
+                <div style="font-size: 0.75rem; margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between;"><span>Wants (Gaya Hidup 30%)</span><span style="color:#94a3b8">Rp 4.200.000 / Rp 4.500.000</span></div>
+                    <div class="budget-bar"><div class="budget-fill" style="width: 93%; background: #2563eb;"></div></div>
                 </div>
                 <div style="font-size: 0.75rem;">
-                    <div style="display:flex; justify-content:space-between;"><span>Savings (Tabungan 20%)</span><span class="text-green">Rp 3.0jt (Tercapai)</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span>Savings (Tabungan/Investasi 20%)</span><span class="text-green">Rp 3.000.000 (Tercapai)</span></div>
                     <div class="budget-bar"><div class="budget-fill" style="width: 100%; background: #10b981;"></div></div>
                 </div>
             </div>
 
+            <!-- Tabel Log Riwayat Transaksi -->
             <div class="card" style="padding: 0; overflow: hidden;">
                 <div style="padding: 15px; background: rgba(255,255,255,0.02); border-bottom: 1px solid #1e293b; font-size: 0.875rem; font-weight: 600;">Riwayat Transaksi Terbaru</div>
-                <div style="padding: 0 15px;">
-                    <template x-for="tx in transactions">
-                        <div class="tx-item">
-                            <div>
-                                <div style="font-weight: 500;" x-text="tx.desc"></div>
-                                <div style="font-size: 0.65rem; color:#94a3b8; margin-top: 2px;" x-text="tx.time + ' • ' + tx.wallet"></div>
-                            </div>
-                            <span style="font-weight: bold; font-size: 0.9rem;" :class="tx.type === 'in' ? 'text-green' : 'text-red'" x-text="(tx.type === 'in' ? '+' : '-') + formatIDR(tx.amount)"></span>
-                        </div>
-                    </template>
-                </div>
+                <div style="padding: 0 15px;" id="tx-container"></div>
             </div>
         </div>
 
         <!-- Kolom Kanan: AI Advisor -->
         <div>
-            <div class="card" style="position: relative;">
+            <div class="card">
                 <h3 style="font-size: 0.875rem; color: #60a5fa; margin-top: 0;">🤖 AI Financial Advisor</h3>
-                <p style="font-size: 0.75rem; line-height: 1.5; color: #cbd5e1;" x-text="aiAdvice"></p>
+                <p style="font-size: 0.75rem; line-height: 1.5; color: #cbd5e1;" id="aiAdvice"></p>
             </div>
         </div>
     </div>
 
     <script>
-        function financeApp() {
-            return {
-                inputText: '',
-                wallets: [
-                    { name: 'BCA (Utama)', balance: 18500000 },
-                    { name: 'GoPay', balance: 750000 },
-                    { name: 'Cash', balance: 300000 },
-                    { name: 'Credit Card', balance: -2400000 }
-                ],
-                transactions: [
-                    { desc: 'Talangan Makan Sate (Piutang Budi)', time: 'Hari ini, 12:30', wallet: 'BCA', amount: 150000, type: 'out' },
-                    { desc: 'Belanja Bulanan Supermarket', time: 'Kemarin, 19:00', wallet: 'BCA', amount: 850000, type: 'out' }
-                ],
-                aiAdvice: "Analisis Sistem: Struktur finansial Anda terpantau aman. Gunakan kotak interaksi untuk memasukkan mutasi saldo baru secara cepat.",
-                formatIDR(val) {
-                    return 'Rp ' + Math.abs(val).toLocaleString('id-ID');
-                },
-                parseInput() {
-                    let text = this.inputText.trim();
-                    if(!text) return;
+        // Data Dasar Aplikasi Keuangan
+        let data = {
+            wallets: [
+                { name: 'BCA (Utama)', balance: 18500000 },
+                { name: 'GoPay', balance: 750000 },
+                { name: 'Cash', balance: 300000 },
+                { name: 'Credit Card', balance: -2400000 }
+            ],
+            transactions: [
+                { desc: 'Talangan Makan Sate (Piutang Budi)', time: 'Hari ini, 12:30', wallet: 'BCA (Utama)', amount: 150000, type: 'out' },
+                { desc: 'Belanja Bulanan Supermarket', time: 'Kemarin, 19:00', wallet: 'BCA (Utama)', amount: 850000, type: 'out' }
+            ],
+            aiAdvice: "Analisis Longitudinal: Struktur finansial Anda terpantau aman dan stabil. Gunakan kotak interaksi pintar di sebelah kiri untuk memasukkan catatan mutasi saldo baru secara cepat."
+        };
 
-                    let numMatch = text.replace(/[^0-9]/g, '');
-                    let amt = numMatch ? parseInt(numMatch) : 50000;
-                    let isInc = text.toLowerCase().includes('gaji') || text.toLowerCase().includes('dapat') || text.toLowerCase().includes('pemasukan') || text.toLowerCase().includes('masuk');
-
-                    let target = this.wallets[0]; 
-                    if (text.toLowerCase().includes('gopay')) target = this.wallets[1];
-                    if (text.toLowerCase().includes('cash') || text.toLowerCase().includes('tunai')) target = this.wallets[2];
-                    if (text.toLowerCase().includes('cc') || text.toLowerCase().includes('kartu kredit')) target = this.wallets[3];
-
-                    if (isInc) { target.balance += amt; } else { target.balance -= amt; }
-
-                    this.transactions.unshift({
-                        desc: text,
-                        time: 'Baru saja',
-                        wallet: target.name,
-                        amount: amt,
-                        type: isInc ? 'in' : 'out'
-                    });
-
-                    this.aiAdvice = `Sistem memproses transaksi "${text}". Mutasi saldo akun ${target.name} sukses diperbarui.`;
-                    this.inputText = '';
-                },
-                resetData() {
-                    this.wallets.forEach(w => w.balance = 0);
-                    this.transactions = [];
-                    this.aiAdvice = "Ledger telah dikosongkan secara aman.";
-                }
-            }
+        // Fungsi Format Mata Uang Rupiah
+        function formatIDR(val) {
+            return 'Rp ' + Math.abs(val).toLocaleString('id-ID');
         }
-    </script>
-</body>
-</html>
+
+        // Fungsi Merender Ulang Tampilan Visual Halaman (Render Engine)
+        function renderUI() {
+            // 1. Render Kartu Saldo Dompet
+            const walletContainer = document.getElementById('wallet-container');
+            walletContainer.innerHTML = '';
+            data.wallets.forEach(w => {
+                let colorStyle = w.balance < 0 ? 'color: #f43f5e;' : 'color: #34d399;';
+                walletContainer.innerHTML += `
+                    <div class="wallet-box">
+                        <p class="wallet-name">${w.name}</p>
+                        <p class="wallet-bal" style="${colorStyle}">${formatIDR(w.balance)}</p>
+                    </div>
+                `;
+            });
+
+            // 2. Render Tabel Transaksi
+            const txContainer = document.getElementById('tx-container');
+            txContainer.innerHTML = '';
+            data.transactions.forEach(t => {
+                let isInc = t.type === 'in';
+                txContainer.innerHTML += `
+                    <div class="tx-item">
+                        <div>
+                            <div style="font-weight: 500; color: #e2e8f0;">${t.desc}</div>
+                            <div style="font-size: 0.65rem; color:#94a3b8; margin-top: 2px;">${t.time} • ${t.wallet}</div>
+                        </div>
+                        <span style="font-weight: bold; font-size: 0.9rem;" class="${isInc ? 'text-green' : 'text-red'}">
+                            ${isInc ? '+' : '-'}${formatIDR(t.amount)}
+                        </span>
+                    </div>
+                `;
+            });
+
+            // 3. Render Catatan AI Advisor
+            document.getElementById('aiAdvice').innerText = data.aiAdvice;
+        }
+
+        // Fungsi Pengolah Kata Kunci Bahasa Sehari-hari (NLP Core Engine)
+        function parseInput() {
+            const inputEl = document.getElementById('inputText');
+            let text = inputEl.value.trim();
+            if(!text) return;
+
+            // Ekstraksi angka nominal uang otomatis
+            let numMatch = text.replace(/[^0-9]/g, '');
+            let amt = numMatch ? parseInt(numMatch) : 50000;
+            
+            // Deteksi jenis transaksi (Uang Masuk vs Uang Keluar)
+            let textLower = text.toLowerCase();
+            let isInc = textLower.includes('gaji') || textLower.includes('dapat') || textLower.includes('pemasukan') || textLower.includes('masuk') || textLower.includes('transferan');
+
+            // Deteksi Akun Dompet Tujuan
+            let target = data.wallets[0]; // Default ke BCA
+            if (textLower.includes('gopay')) target = data.wallets[1];
+            if (textLower.includes('cash') || textLower.includes('tunai')) target = data.wallets[2];
+            if (textLower.includes('cc') || textLower.includes('kartu kredit')) target = data.wallets[3];
+
+            // Mutasikan Nilai Saldo secara Real-Time
+            if (isInc) {
+                target.balance += amt;

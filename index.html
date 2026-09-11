@@ -49,12 +49,12 @@
                 </template>
             </div>
 
-            <!-- AI Hybrid Input Box (Tersambung Langsung ke Gemini Asli) -->
+            <!-- AI Input Box -->
             <div class="bg-finance-darkCard border border-slate-800 p-5 rounded-2xl shadow-md border-l-4 border-blue-500">
-                <label class="block text-sm font-semibold mb-2 text-slate-200">✨ Catat Transaksi dengan Bahasa Sehari-hari (Gemini 3.7 Live):</label>
+                <label class="block text-sm font-semibold mb-2 text-slate-200">✨ Catat Transaksi dengan Bahasa Sehari-hari (AI Pintar):</label>
                 <div class="flex gap-2">
-                    <input type="text" x-model="inputText" @keydown.enter="parseInput()" :disabled="loading" placeholder="Contoh: dapet gaji 5jt dari kantor via BCA" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-100 placeholder-slate-500 disabled:opacity-50">
-                    <button @click="parseInput()" :disabled="loading" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/20 disabled:opacity-50" x-text="loading ? 'Berpikir...' : 'Kirim'"></button>
+                    <input type="text" x-model="inputText" @keydown.enter="parseInput()" placeholder="Contoh: dapet gaji 5jt dari kantor via BCA" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-100 placeholder-slate-500">
+                    <button @click="parseInput()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/20">Kirim</button>
                 </div>
             </div>
 
@@ -108,9 +108,6 @@
         function financeApp() {
             return {
                 inputText: '',
-                loading: false,
-                // Masukkan Kunci API dari Google AI Studio Anda di sini
-                apiKey: 'MASUKKAN_KUNCI_API_GEMINI_ANDA', 
                 wallets: [
                     { name: 'BCA (Utama)', balance: 18500000 },
                     { name: 'GoPay', balance: 750000 },
@@ -125,37 +122,38 @@
                 formatIDR(val) {
                     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.abs(val));
                 },
-                async parseInput() {
+                parseInput() {
                     let text = this.inputText.trim();
-                    if(!text || this.loading) return;
-                    this.loading = true;
+                    if(!text) return;
 
-                    // Integrasi Langsung ke API Google Gemini Cloud Resmi
-                    let url = `https://googleapis.com{this.apiKey}`;
-                    let systemPrompt = "Kamu adalah AI akuntan pintar. Ekstrak teks pengeluaran menjadi JSON terstruktur berisi key: 'amount' (angka nominal murni), 'type' (isi 'in' jika uang masuk/gaji/dapat untung, isi 'out' jika belanja/beli/bayar), 'wallet' (pilih 'BCA', 'GoPay', atau 'Cash'). Balas HANYA dengan format JSON murni tanpa markdown.";
+                    let numMatch = text.replace(/[^0-9]/g, '');
+                    let amt = numMatch ? parseInt(numMatch) : 50000;
+                    let isInc = text.toLowerCase().includes('gaji') || text.toLowerCase().includes('dapat') || text.toLowerCase().includes('pemasukan');
 
-                    try {
-                        let response = await fetch(url, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                contents: [{ parts: [{ text: text }] }],
-                                systemInstruction: { parts: [{ text: systemPrompt }] },
-                                generationConfig: { responseMimeType: "application/json" }
-                            })
-                        });
+                    let target = this.wallets[0]; // Default BCA
+                    if (text.toLowerCase().includes('gopay')) target = this.wallets[1];
+                    if (text.toLowerCase().includes('cash')) target = this.wallets[2];
 
-                        let data = await response.json();
-                        let rawJson = JSON.parse(data.candidates[0].content.parts[0].text);
-                        
-                        // Eksekusi mutasi saldo otomatis secara real-time
-                        let amt = rawJson.amount || 50000;
-                        let isInc = rawJson.type === 'in';
-                        let wName = rawJson.wallet || 'BCA';
+                    if (isInc) { target.balance += amt; } else { target.balance -= amt; }
 
-                        let target = this.wallets.find(w => w.name.includes(wName)) || this.wallets[0];
-                        if (isInc) { target.balance += amt; } else { target.balance -= amt; }
+                    this.transactions.unshift({
+                        desc: text,
+                        time: 'Baru saja',
+                        wallet: target.name,
+                        amount: amt,
+                        type: isInc ? 'in' : 'out'
+                    });
 
-                        this.transactions.unshift({
-                            desc: text,
-                            time: 'Baru saja',
+                    this.aiAdvice = `AI sukses memproses transaksi "${text}". Saldo ${target.name} langsung ter-update!`;
+                    this.inputText = '';
+                },
+                resetData() {
+                    this.wallets.forEach(w => w.balance = 0);
+                    this.transactions = [];
+                    this.aiAdvice = "Ledger dikosongkan. Silakan isi data baru.";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

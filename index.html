@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DompetAI - Asisten Finansial Modern</title>
+    <script src="https://tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { DEFAULT: '#0f172a', accent: '#2563eb' },
+                        success: { DEFAULT: '#10b981', light: '#34d399' },
+                        finance: { darkBg: '#0b0f19', darkCard: '#151b2c', lightBg: '#f8fafc', lightCard: '#ffffff' }
+                    }
+                }
+            }
+        }
+    </script>
+    <script defer src="https://jsdelivr.net"></script>
+</head>
+<body class="bg-finance-darkBg text-slate-100 min-h-screen font-sans antialiased" x-data="financeApp()">
+    
+    <!-- Top Navigation -->
+    <header class="border-b border-slate-800 bg-finance-darkCard/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-success/20 text-success p-2 rounded-xl font-bold text-lg">💰 DompetAI</div>
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-full border border-blue-500/30">Mode Demo: Tech Pro ID</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button @click="resetData()" class="text-xs bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/30 px-3 py-1.5 rounded-lg transition">Clear Slate (Reset)</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Wallet Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <template x-for="wallet in wallets">
+                    <div class="bg-finance-darkCard border border-slate-800/80 p-4 rounded-2xl shadow-sm">
+                        <p class="text-xs text-slate-400 font-medium" x-text="wallet.name"></p>
+                        <p class="text-base sm:text-lg font-bold mt-1" :class="wallet.balance >= 0 ? 'text-emerald-400' : 'text-rose-400'" x-text="formatIDR(wallet.balance)"></p>
+                    </div>
+                </template>
+            </div>
+
+            <!-- AI Hybrid Input Box (Tersambung Langsung ke Gemini Asli) -->
+            <div class="bg-finance-darkCard border border-slate-800 p-5 rounded-2xl shadow-md border-l-4 border-blue-500">
+                <label class="block text-sm font-semibold mb-2 text-slate-200">✨ Catat Transaksi dengan Bahasa Sehari-hari (Gemini 3.7 Live):</label>
+                <div class="flex gap-2">
+                    <input type="text" x-model="inputText" @keydown.enter="parseInput()" :disabled="loading" placeholder="Contoh: dapet gaji 5jt dari kantor via BCA" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 text-slate-100 placeholder-slate-500 disabled:opacity-50">
+                    <button @click="parseInput()" :disabled="loading" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-blue-600/20 disabled:opacity-50" x-text="loading ? 'Berpikir...' : 'Kirim'"></button>
+                </div>
+            </div>
+
+            <!-- 50/30/20 Budget Bar -->
+            <div class="bg-finance-darkCard border border-slate-800 p-5 rounded-2xl">
+                <h3 class="text-sm font-semibold mb-3 text-slate-200">Alokasi Anggaran 50/30/20</h3>
+                <div class="space-y-3 text-xs">
+                    <div>
+                        <div class="flex justify-between mb-1"><span>Needs (Kebutuhan 50%)</span><span class="text-slate-400">Rp 7.5jt / Rp 7.5jt</span></div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-slate-400 h-full w-full"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1"><span>Wants (Keinginan 30%)</span><span class="text-slate-400">Rp 4.2jt / Rp 4.5jt</span></div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-blue-500 h-full" style="width: 93%"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1"><span>Savings (Tabungan 20%)</span><span class="text-emerald-400 font-medium">Rp 3.0jt (Tercapai)</span></div>
+                        <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full w-full"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
+            <div class="bg-finance-darkCard border border-slate-800 rounded-2xl overflow-hidden">
+                <div class="p-4 border-b border-slate-800 font-semibold text-sm">Riwayat Transaksi Terbaru</div>
+                <div class="divide-y divide-slate-800/60 text-xs">
+                    <template x-for="tx in transactions">
+                        <div class="p-4 flex justify-between items-center hover:bg-slate-800/30 transition">
+                            <div>
+                                <p class="font-medium text-slate-200" x-text="tx.desc"></p>
+                                <p class="text-slate-400 text-[10px] mt-0.5" x-text="tx.time + ' • ' + tx.wallet"></p>
+                            </div>
+                            <span class="font-bold" :class="tx.type === 'in' ? 'text-emerald-400' : 'text-rose-400'" x-text="(tx.type === 'in' ? '+' : '-') + formatIDR(tx.amount)"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kolom Kanan: AI Advisor Insights -->
+        <div class="space-y-6">
+            <div class="bg-finance-darkCard border border-slate-800 p-5 rounded-2xl shadow-md relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 text-4xl">🤖</div>
+                <h3 class="text-sm font-bold text-blue-400 mb-2 flex items-center gap-2"><span>AI Financial Advisor</span></h3>
+                <p class="text-xs text-slate-300 leading-relaxed mb-4" x-text="aiAdvice"></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function financeApp() {
+            return {
+                inputText: '',
+                loading: false,
+                // Masukkan Kunci API dari Google AI Studio Anda di sini
+                apiKey: 'MASUKKAN_KUNCI_API_GEMINI_ANDA', 
+                wallets: [
+                    { name: 'BCA (Utama)', balance: 18500000 },
+                    { name: 'GoPay', balance: 750000 },
+                    { name: 'Cash', balance: 300000 },
+                    { name: 'Credit Card', balance: -2400000 }
+                ],
+                transactions: [
+                    { desc: 'Talangan Makan Sate (Piutang Budi)', time: 'Hari ini, 12:30', wallet: 'BCA', amount: 150000, type: 'out' },
+                    { desc: 'Belanja Bulanan Supermarket', time: 'Kemarin, 19:00', wallet: 'BCA', amount: 850000, type: 'out' }
+                ],
+                aiAdvice: "Analisis Jangka Panjang Aktif: Keuangan Anda stabil. Gunakan chat box untuk menganalisis tren lebih lanjut.",
+                formatIDR(val) {
+                    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Math.abs(val));
+                },
+                async parseInput() {
+                    let text = this.inputText.trim();
+                    if(!text || this.loading) return;
+                    this.loading = true;
+
+                    // Integrasi Langsung ke API Google Gemini Cloud Resmi
+                    let url = `https://googleapis.com{this.apiKey}`;
+                    let systemPrompt = "Kamu adalah AI akuntan pintar. Ekstrak teks pengeluaran menjadi JSON terstruktur berisi key: 'amount' (angka nominal murni), 'type' (isi 'in' jika uang masuk/gaji/dapat untung, isi 'out' jika belanja/beli/bayar), 'wallet' (pilih 'BCA', 'GoPay', atau 'Cash'). Balas HANYA dengan format JSON murni tanpa markdown.";
+
+                    try {
+                        let response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: text }] }],
+                                systemInstruction: { parts: [{ text: systemPrompt }] },
+                                generationConfig: { responseMimeType: "application/json" }
+                            })
+                        });
+
+                        let data = await response.json();
+                        let rawJson = JSON.parse(data.candidates[0].content.parts[0].text);
+                        
+                        // Eksekusi mutasi saldo otomatis secara real-time
+                        let amt = rawJson.amount || 50000;
+                        let isInc = rawJson.type === 'in';
+                        let wName = rawJson.wallet || 'BCA';
+
+                        let target = this.wallets.find(w => w.name.includes(wName)) || this.wallets[0];
+                        if (isInc) { target.balance += amt; } else { target.balance -= amt; }
+
+                        this.transactions.unshift({
+                            desc: text,
+                            time: 'Baru saja',
